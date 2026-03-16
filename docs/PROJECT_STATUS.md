@@ -1,15 +1,12 @@
 # Project Status
 
 ## Current Phase
-
-Foundation
+Phase B — Catalog Module
 
 ## Current Module
-
 Catalog
 
 ## Current Task
-
 Create Offer
 
 ---
@@ -21,6 +18,9 @@ Create Offer
 - Base package structure
 - Health endpoint
 - Initial documentation
+- Test configuration
+- Offer entity implemented
+- Database tables created (offers, offer_tags)
 
 ---
 
@@ -32,18 +32,7 @@ Create Offer
 
 ## Next Tasks
 
-1. Implement Offer entity
-2. Create OfferRepository
-3. Implement CreateOfferService
-4. Implement CreateOfferController
-5. Write basic tests
-
-2026-03-06
-
-DONE
-- project bootstrap
-- health endpoint
-- test configuration
-
-NEXT
-- implement Offer entity
+1. Create OfferRepository
+2. Implement CreateOfferService
+3. Implement CreateOfferController
+4. Write basic tests
