@@ -1,9 +1,15 @@
 spring:
   application:
     name: pharmacy-assistant
+  datasource:
+    url: jdbc:postgresql://localhost:5433/pharmacyIA
+    username: postgres
+    password: 280776
 
-  profiles:
-    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 management:
   endpoints:

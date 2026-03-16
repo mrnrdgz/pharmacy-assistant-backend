@@ -13,8 +13,8 @@ This project is designed as:
 
 ## Tech Stack
 
-- Java 17
-- Spring Boot 3
+- Java 21
+- Spring Boot 3.5.x
 - Maven
 - PostgreSQL
 - JUnit + Mockito
@@ -34,12 +34,23 @@ The application follows a **modular monolith architecture** with clear boundarie
 
 Each module follows layered architecture:
 
-Controller → Service → Repository → Database
+web → application → domain → infrastructure
 
 ---
 
 ## Current Status
 
-Phase A – Project Bootstrap & Architecture Definition
+Phase A — Foundation
+
+Completed:
+
+- Spring Boot project bootstrap
+- Maven configuration
+- Base package structure
+- Health endpoint
+
+Next step:
+
+Catalog module — Create Offer use case
 
 See `/docs/ROADMAP.md` for detailed plan.

@@ -12,50 +12,86 @@ The system is designed as a **Modular Monolith**.
 - Simpler deployment
 - Suitable for small-to-medium domain complexity
 
-The codebase is structured by modules with clear internal boundaries to allow future extraction if necessary.
+The codebase is organized into modules with clear internal boundaries,
+allowing future extraction into microservices if necessary.
 
 ---
 
 ## Layered Architecture
 
-Each module follows this structure:
+Each module follows the same layered structure:
 
-- API Layer (Controllers, DTOs)
-- Service Layer (Business logic / Use cases)
-- Domain Layer (Entities and business rules)
-- Persistence Layer (Repositories)
+web → application → domain → infrastructure
 
-Dependency direction:
+### Layer Responsibilities
 
-API → Service → Domain → Persistence
+**web**
 
-The Domain layer must not depend on Spring-specific APIs.
+- REST controllers
+- HTTP request/response handling
+- DTO mapping
+
+**application**
+
+- Use cases
+- Application services
+- Coordination of domain operations
+
+**domain**
+
+- Entities
+- Value objects
+- Core business rules
+
+**infrastructure**
+
+- Database access
+- JPA repositories
+- External integrations
+
+---
+
+## Dependency Rules
+
+Dependencies must follow this direction:
+
+web → application → domain  
+infrastructure → domain
+
+The **domain layer must not depend on Spring or infrastructure frameworks.**
 
 ---
 
 ## Core Modules
 
 ### catalog
-Manages offer items available for recommendation.
+Manages pharmacy offers available for recommendation.
 
 ### knowledge
-Stores static FAQ knowledge for assistant context.
+Stores FAQ and pharmacy-related knowledge.
 
 ### inquiries
-Tracks user interactions and generated responses.
+Tracks customer questions and assistant responses.
 
 ### assistant
-Orchestrates AI interactions, context building, and recommendation logic.
+Coordinates AI interaction and builds assistant responses.
 
 ---
 
-## Future AI Integration
+## AI Integration (Future)
 
-AI will be integrated via an abstraction layer:
+AI will be integrated through an abstraction layer:
 
-AssistantService → AiClient (interface) → Implementation (OpenAI or other provider)
+AssistantService → AiClient (interface) → Provider Implementation
 
-This ensures:
-- Testability
-- Vendor independence
-- Cost control during development
+Examples of implementations:
+
+- OpenAI client
+- Mock client (for tests)
+- Local model client
+
+Benefits:
+
+- vendor independence
+- easier testing
+- flexible provider switching
