@@ -7,7 +7,7 @@ Phase B — Catalog Module
 Catalog
 
 ## Current Task
-Create Offer
+Create Offer use case
 
 ---
 
@@ -26,7 +26,7 @@ Create Offer
 
 ## In Progress
 
-- None
+- Create Offer use case
 
 ---
 
@@ -35,4 +35,4 @@ Create Offer
 1. Create OfferRepository
 2. Implement CreateOfferService
 3. Implement CreateOfferController
-4. Write basic tests
+4. Test Create Offer endpoint
