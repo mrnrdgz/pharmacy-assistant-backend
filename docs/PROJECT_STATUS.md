@@ -26,8 +26,16 @@ None
 - Create Offer use case implemented
 - CreateOfferService
 - OfferController
-- Controller test
-- Service test
+- Create Offer - Controller test
+- Create Offer - Service test
+- Create Offer - Repository test
+
+- List Offers use case implemented
+- ListOffersService
+- GET /offers endpoint
+- OfferResponse DTO
+- List Offers - Service test
+- List Offers - Controller test
 
 ---
 
@@ -39,8 +47,7 @@ None
 
 ## Next Tasks
 
-1. List Offers endpoint
-2. Update Offer
-3. Disable Offer
-4. DTOs and validation improvements
-5. Integration tests
+1. Update Offer
+2. Disable Offer
+3. DTOs and validation improvements
+4. Integration tests
