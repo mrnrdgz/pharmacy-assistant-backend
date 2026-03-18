@@ -7,7 +7,7 @@ Phase B — Catalog Module
 Catalog
 
 ## Current Task
-Create Offer use case
+None
 
 ---
 
@@ -19,20 +19,28 @@ Create Offer use case
 - Health endpoint
 - Initial documentation
 - Test configuration
+
 - Offer entity implemented
 - Database tables created (offers, offer_tags)
+
+- Create Offer use case implemented
+- CreateOfferService
+- OfferController
+- Controller test
+- Service test
 
 ---
 
 ## In Progress
 
-- Create Offer use case
+- None
 
 ---
 
 ## Next Tasks
 
-1. Create OfferRepository
-2. Implement CreateOfferService
-3. Implement CreateOfferController
-4. Test Create Offer endpoint
+1. List Offers endpoint
+2. Update Offer
+3. Disable Offer
+4. DTOs and validation improvements
+5. Integration tests
