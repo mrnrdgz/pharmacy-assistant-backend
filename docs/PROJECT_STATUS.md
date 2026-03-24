@@ -7,7 +7,7 @@ Phase B — Catalog Module
 Catalog
 
 ## Current Task
-None
+Update Offer
 
 ---
 
@@ -36,18 +36,20 @@ None
 - OfferResponse DTO
 - List Offers - Service test
 - List Offers - Controller test
+- Create Offer
+- List Offers
+- Update Offer
 
 ---
 
 ## In Progress
 
-- None
+- none
 
 ---
 
 ## Next Tasks
 
-1. Update Offer
-2. Disable Offer
-3. DTOs and validation improvements
-4. Integration tests
+1. Disable Offer
+2. DTOs and validation improvements
+3. Integration tests

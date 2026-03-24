@@ -1,7 +1,6 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -10,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class OfferRepositoryTest {
@@ -19,29 +18,80 @@ class OfferRepositoryTest {
     private IOfferRepository offerRepository;
 
     @Test
-    @DisplayName("Should save and retrieve an Offer from database")
-    void shouldSaveAndFindOffer() {
+    void shouldSaveOffer() {
 
         // GIVEN
         Offer offer = Offer.builder()
                 .title("Perfume Test")
-                .description("Fragancia test")
+                .description("Desc")
                 .price(new BigDecimal("10000"))
                 .category("perfumes")
-                .tags(Set.of("test"))
+                .tags(Set.of("test", "promo"))
                 .build();
 
         // WHEN
         Offer savedOffer = offerRepository.save(offer);
 
-        Optional<Offer> foundOffer = offerRepository.findById(savedOffer.getId());
+        // THEN
+        assertNotNull(savedOffer.getId());
+        assertEquals("Perfume Test", savedOffer.getTitle());
+        assertEquals("Desc", savedOffer.getDescription());
+        assertEquals(0, savedOffer.getPrice().compareTo(new BigDecimal("10000")));
+        assertEquals("perfumes", savedOffer.getCategory());
+        assertEquals(Set.of("test", "promo"), savedOffer.getTags());
+    }
+
+    @Test
+    void shouldSetDefaultValuesOnPersist() {
+
+        // GIVEN
+        Offer offer = Offer.builder()
+                .title("Ibuprofen Promo")
+                .description("Pain relief")
+                .price(new BigDecimal("2500"))
+                .category("pain_relief")
+                .tags(Set.of("pain"))
+                .build();
+
+        // WHEN
+        Offer savedOffer = offerRepository.save(offer);
 
         // THEN
-        assertThat(savedOffer.getId()).isNotNull();
+        assertNotNull(savedOffer.getId());
+        assertTrue(savedOffer.getActive());
+        assertNotNull(savedOffer.getCreatedAt());
+        assertNotNull(savedOffer.getUpdatedAt());
+    }
 
-        assertThat(foundOffer).isPresent();
-        assertThat(foundOffer.get().getTitle()).isEqualTo("Perfume Test");
-        assertThat(foundOffer.get().getPrice()).isEqualByComparingTo("10000");
-        assertThat(foundOffer.get().getTags()).contains("test");
+    @Test
+    void shouldFindSavedOfferById() {
+
+        // GIVEN
+        Offer offer = Offer.builder()
+                .title("Vitamin C")
+                .description("Immune support")
+                .price(new BigDecimal("1800"))
+                .category("vitamins")
+                .tags(Set.of("immune"))
+                .build();
+
+        Offer savedOffer = offerRepository.save(offer);
+
+        // WHEN
+        Optional<Offer> result = offerRepository.findById(savedOffer.getId());
+
+        // THEN
+        assertTrue(result.isPresent());
+
+        Offer foundOffer = result.get();
+        assertEquals(savedOffer.getId(), foundOffer.getId());
+        assertEquals("Vitamin C", foundOffer.getTitle());
+        assertEquals("Immune support", foundOffer.getDescription());
+        assertEquals(0, foundOffer.getPrice().compareTo(new BigDecimal("1800")));
+        assertEquals("vitamins", foundOffer.getCategory());
+        assertEquals(Set.of("immune"), foundOffer.getTags());
+        assertTrue(foundOffer.getActive());
+        assertNotNull(foundOffer.getCreatedAt());
+        assertNotNull(foundOffer.getUpdatedAt());
     }
 }

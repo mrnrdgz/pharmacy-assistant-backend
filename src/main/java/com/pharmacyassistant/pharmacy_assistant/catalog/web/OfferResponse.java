@@ -1,13 +1,17 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.web;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+@Data
 @Getter
+@Setter
 @AllArgsConstructor
 public class OfferResponse {
 

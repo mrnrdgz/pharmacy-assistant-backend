@@ -2,7 +2,6 @@ package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
-import com.pharmacyassistant.pharmacy_assistant.catalog.web.CreateOfferRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,13 +13,13 @@ public class CreateOfferService {
         this.offerRepository = offerRepository;
     }
 
-    public Offer createOffer(CreateOfferRequest request) {
+    public Offer createOffer(CreateOfferCommand command) {
         Offer offer = Offer.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .category(request.getCategory())
-                .tags(request.getTags())
+                .title(command.getTitle())
+                .description(command.getDescription())
+                .price(command.getPrice())
+                .category(command.getCategory())
+                .tags(command.getTags())
                 .build();
 
         return offerRepository.save(offer);

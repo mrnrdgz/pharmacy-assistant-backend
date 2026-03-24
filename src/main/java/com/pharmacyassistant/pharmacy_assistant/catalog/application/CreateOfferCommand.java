@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-public class UpdateOfferCommand {
+public class CreateOfferCommand {
 
     private String title;
     private String description;

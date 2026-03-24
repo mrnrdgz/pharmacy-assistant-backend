@@ -2,7 +2,6 @@ package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
-import com.pharmacyassistant.pharmacy_assistant.catalog.web.CreateOfferRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -13,8 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateOfferServiceTest {
@@ -27,12 +29,15 @@ class CreateOfferServiceTest {
 
     @Test
     void shouldCreateOffer() {
-        CreateOfferRequest request = new CreateOfferRequest();
-        request.setTitle("Perfume Test");
-        request.setDescription("Desc");
-        request.setPrice(new BigDecimal("10000"));
-        request.setCategory("perfumes");
-        request.setTags(Set.of("test"));
+
+        // GIVEN
+        CreateOfferCommand command = new CreateOfferCommand(
+                "Perfume Test",
+                "Desc",
+                new BigDecimal("10000"),
+                "perfumes",
+                Set.of("test")
+        );
 
         Offer savedOffer = Offer.builder()
                 .id(1L)
@@ -45,8 +50,10 @@ class CreateOfferServiceTest {
 
         when(offerRepository.save(any(Offer.class))).thenReturn(savedOffer);
 
-        Offer result = createOfferService.createOffer(request);
+        // WHEN
+        Offer result = createOfferService.createOffer(command);
 
+        // THEN
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("Perfume Test", result.getTitle());
