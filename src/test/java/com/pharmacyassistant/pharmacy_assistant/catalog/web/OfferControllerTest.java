@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +41,9 @@ class OfferControllerTest {
 
     @MockBean
     private UpdateOfferService updateOfferService;
+
+    @MockBean
+    private DisableOfferService disableOfferService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -274,5 +278,35 @@ class OfferControllerTest {
 
         verify(updateOfferService, never())
                 .updateOffer(any(Long.class), any(UpdateOfferCommand.class));
+    }
+    @Test
+    void shouldDisableOffer() throws Exception {
+
+        // GIVEN
+        Long offerId = 1L;
+
+        Offer disabledOffer = Offer.builder()
+                .id(offerId)
+                .title("Perfume Test")
+                .description("Desc")
+                .price(new BigDecimal("10000"))
+                .category("perfumes")
+                .tags(Set.of("test"))
+                .active(false)
+                .build();
+
+        when(disableOfferService.disableOffer(offerId)).thenReturn(disabledOffer);
+
+        // WHEN + THEN
+        mockMvc.perform(patch("/offers/{id}/disable", offerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("Perfume Test"))
+                .andExpect(jsonPath("$.description").value("Desc"))
+                .andExpect(jsonPath("$.price").value(10000))
+                .andExpect(jsonPath("$.category").value("perfumes"))
+                .andExpect(jsonPath("$.active").value(false));
+
+        verify(disableOfferService, times(1)).disableOffer(offerId);
     }
 }

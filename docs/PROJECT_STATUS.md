@@ -7,9 +7,7 @@ Phase B — Catalog Module
 Catalog
 
 ## Current Task
-Update Offer
-
----
+DTOs and validation improvements
 
 ## Completed
 
@@ -36,20 +34,27 @@ Update Offer
 - OfferResponse DTO
 - List Offers - Service test
 - List Offers - Controller test
-- Create Offer
-- List Offers
-- Update Offer
+
+- Update Offer use case implemented
+- UpdateOfferService
+- PUT /offers/{id}
+- Update Offer - Service test
+- Update Offer - Controller test
+
+- Disable Offer use case implemented
+- DisableOfferService
+- PATCH /offers/{id}/disable
+- Disable Offer - Service test
+- Disable Offer - Controller test
 
 ---
 
 ## In Progress
 
-- none
+- DTOs and validation improvements
 
 ---
 
 ## Next Tasks
 
-1. Disable Offer
-2. DTOs and validation improvements
-3. Integration tests
+1. Integration tests
