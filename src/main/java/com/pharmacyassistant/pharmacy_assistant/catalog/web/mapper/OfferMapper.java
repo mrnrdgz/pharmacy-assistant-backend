@@ -1,15 +1,11 @@
-package com.pharmacyassistant.pharmacy_assistant.catalog.web;
+package com.pharmacyassistant.pharmacy_assistant.catalog.web.mapper;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
-import lombok.Data;
-import lombok.Getter;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.OfferResponse;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OfferMapper {
 
     public static OfferResponse toResponse(Offer offer) {

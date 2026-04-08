@@ -1,7 +1,15 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.web;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.application.*;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.dto.CreateOfferCommand;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.dto.UpdateOfferCommand;
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.CreateOfferRequest;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.OfferResponse;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.UpdateOfferRequest;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.mapper.CreateOfferRequestMapper;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.mapper.OfferMapper;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.mapper.UpdateOfferRequestMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

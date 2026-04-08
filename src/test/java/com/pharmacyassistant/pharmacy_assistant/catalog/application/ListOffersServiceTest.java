@@ -1,8 +1,9 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.ListOffersService;
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
-import com.pharmacyassistant.pharmacy_assistant.catalog.web.OfferResponse;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.OfferResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +30,8 @@ class ListOffersServiceTest {
 
     @Test
     void shouldReturnListOfOfferResponses() {
-        // given
+
+        // GIVEN
         Offer offer1 = Offer.builder()
                 .id(1L)
                 .title("Ibuprofen 400mg")
@@ -55,10 +58,10 @@ class ListOffersServiceTest {
 
         when(offerRepository.findAll()).thenReturn(List.of(offer1, offer2));
 
-        // when
+        // WHEN
         List<OfferResponse> result = listOffersService.list();
 
-        // then
+        // THEN
         assertEquals(2, result.size());
 
         OfferResponse first = result.get(0);
@@ -71,5 +74,18 @@ class ListOffersServiceTest {
         assertEquals(true, first.getActive());
         assertEquals(LocalDate.of(2025, 3, 1), first.getValidFrom());
         assertEquals(LocalDate.of(2025, 3, 31), first.getValidTo());
+
+        OfferResponse second = result.get(1);
+        assertEquals(2L, second.getId());
+        assertEquals("Vitamin C", second.getTitle());
+        assertEquals("Immune support supplement", second.getDescription());
+        assertEquals(new BigDecimal("1800.00"), second.getPrice());
+        assertEquals("VITAMINS", second.getCategory());
+        assertEquals(Set.of("immune", "daily"), second.getTags());
+        assertEquals(true, second.getActive());
+        assertEquals(LocalDate.of(2025, 4, 1), second.getValidFrom());
+        assertEquals(LocalDate.of(2025, 4, 30), second.getValidTo());
+
+        verify(offerRepository).findAll();
     }
 }

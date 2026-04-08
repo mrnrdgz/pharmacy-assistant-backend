@@ -2,7 +2,7 @@ package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
-import com.pharmacyassistant.pharmacy_assistant.catalog.web.OfferResponse;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.OfferResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

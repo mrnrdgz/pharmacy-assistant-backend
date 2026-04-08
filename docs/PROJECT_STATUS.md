@@ -7,7 +7,7 @@ Phase B — Catalog Module
 Catalog
 
 ## Current Task
-DTOs and validation improvements
+Catalog module completed
 
 ## Completed
 
@@ -27,6 +27,7 @@ DTOs and validation improvements
 - Create Offer - Controller test
 - Create Offer - Service test
 - Create Offer - Repository test
+- Create Offer - Integration test (valid + validation errors)
 
 - List Offers use case implemented
 - ListOffersService
@@ -47,14 +48,30 @@ DTOs and validation improvements
 - Disable Offer - Service test
 - Disable Offer - Controller test
 
+- Global exception handling implemented
+- Validation error responses standardized
+
+- Business rules implemented:
+  - validTo cannot be before validFrom
+  - offer title must be unique
+
+- Unit tests for business rules
+- Integration tests:
+  - validation errors
+  - invalid dates
+  - duplicated title
+
 ---
 
 ## In Progress
 
-- DTOs and validation improvements
+- None
 
 ---
 
 ## Next Tasks
 
-1. Integration tests
+1. Start Knowledge module (FAQ)
+2. Implement FAQ entity
+3. Create FAQ use case
+4. List FAQs endpoint

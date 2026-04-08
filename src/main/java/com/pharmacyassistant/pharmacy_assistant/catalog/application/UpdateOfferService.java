@@ -1,5 +1,6 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.dto.UpdateOfferCommand;
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class UpdateOfferService {
         offer.setPrice(command.getPrice());
         offer.setCategory(command.getCategory());
         offer.setTags(command.getTags());
+        offer.setValidFrom(command.getValidFrom());
+        offer.setValidTo(command.getValidTo());
 
         return offerRepository.save(offer);
     }

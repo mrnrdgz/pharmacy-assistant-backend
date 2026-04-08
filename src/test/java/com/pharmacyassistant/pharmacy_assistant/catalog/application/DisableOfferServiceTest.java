@@ -1,5 +1,6 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.application;
 
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.DisableOfferService;
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import com.pharmacyassistant.pharmacy_assistant.catalog.infrastructure.IOfferRepository;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,6 +29,7 @@ class DisableOfferServiceTest {
 
     @Test
     void shouldDisableOffer() {
+
         // GIVEN
         Long offerId = 1L;
 
@@ -38,6 +41,8 @@ class DisableOfferServiceTest {
                 .category("perfumes")
                 .tags(Set.of("test"))
                 .active(true)
+                .validFrom(LocalDate.of(2025, 3, 1))
+                .validTo(LocalDate.of(2025, 3, 31))
                 .build();
 
         Offer savedOffer = Offer.builder()
@@ -48,6 +53,8 @@ class DisableOfferServiceTest {
                 .category("perfumes")
                 .tags(Set.of("test"))
                 .active(false)
+                .validFrom(LocalDate.of(2025, 3, 1))
+                .validTo(LocalDate.of(2025, 3, 31))
                 .build();
 
         when(offerRepository.findById(offerId)).thenReturn(Optional.of(existingOffer));
@@ -60,6 +67,8 @@ class DisableOfferServiceTest {
         assertNotNull(result);
         assertEquals(offerId, result.getId());
         assertFalse(result.getActive());
+        assertEquals(LocalDate.of(2025, 3, 1), result.getValidFrom());
+        assertEquals(LocalDate.of(2025, 3, 31), result.getValidTo());
 
         verify(offerRepository, times(1)).findById(offerId);
 
@@ -68,10 +77,13 @@ class DisableOfferServiceTest {
 
         Offer offerToSave = captor.getValue();
         assertFalse(offerToSave.getActive());
+        assertEquals(LocalDate.of(2025, 3, 1), offerToSave.getValidFrom());
+        assertEquals(LocalDate.of(2025, 3, 31), offerToSave.getValidTo());
     }
 
     @Test
     void shouldThrowExceptionWhenOfferDoesNotExist() {
+
         // GIVEN
         Long offerId = 99L;
         when(offerRepository.findById(offerId)).thenReturn(Optional.empty());

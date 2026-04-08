@@ -1,5 +1,6 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.domain;
 
+import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

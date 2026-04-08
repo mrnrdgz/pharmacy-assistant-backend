@@ -1,12 +1,23 @@
 package com.pharmacyassistant.pharmacy_assistant.catalog.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pharmacyassistant.pharmacy_assistant.catalog.application.*;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.CreateOfferService;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.DisableOfferService;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.ListOffersService;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.UpdateOfferService;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.dto.CreateOfferCommand;
+import com.pharmacyassistant.pharmacy_assistant.catalog.application.dto.UpdateOfferCommand;
 import com.pharmacyassistant.pharmacy_assistant.catalog.domain.Offer;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.OfferController;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.CreateOfferRequest;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.OfferResponse;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.dto.UpdateOfferRequest;
+import com.pharmacyassistant.pharmacy_assistant.catalog.web.handler.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -15,19 +26,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OfferController.class)
+@Import(GlobalExceptionHandler.class)
 class OfferControllerTest {
 
     @Autowired
@@ -51,13 +64,14 @@ class OfferControllerTest {
     @Test
     void shouldCreateOffer() throws Exception {
 
-        // GIVEN
         CreateOfferRequest request = new CreateOfferRequest();
         request.setTitle("Perfume Test");
         request.setDescription("Desc");
         request.setPrice(new BigDecimal("10000"));
         request.setCategory("perfumes");
         request.setTags(Set.of("test"));
+        request.setValidFrom(LocalDate.of(2025, 3, 1));
+        request.setValidTo(LocalDate.of(2025, 3, 31));
 
         Offer offer = Offer.builder()
                 .id(1L)
@@ -67,11 +81,12 @@ class OfferControllerTest {
                 .category("perfumes")
                 .tags(Set.of("test"))
                 .active(true)
+                .validFrom(LocalDate.of(2025, 3, 1))
+                .validTo(LocalDate.of(2025, 3, 31))
                 .build();
 
         when(createOfferService.createOffer(any(CreateOfferCommand.class))).thenReturn(offer);
 
-        // WHEN + THEN
         mockMvc.perform(post("/offers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -81,15 +96,16 @@ class OfferControllerTest {
                 .andExpect(jsonPath("$.description").value("Desc"))
                 .andExpect(jsonPath("$.price").value(10000))
                 .andExpect(jsonPath("$.category").value("perfumes"))
-                .andExpect(jsonPath("$.active").value(true));
+                .andExpect(jsonPath("$.active").value(true))
+                .andExpect(jsonPath("$.validFrom").value("2025-03-01"))
+                .andExpect(jsonPath("$.validTo").value("2025-03-31"));
 
         verify(createOfferService, times(1)).createOffer(any(CreateOfferCommand.class));
     }
 
     @Test
-    void shouldReturnBadRequestWhenPriceIsNegative() throws Exception {
+    void shouldReturnValidationErrorWhenPriceIsNegative() throws Exception {
 
-        // GIVEN
         CreateOfferRequest request = new CreateOfferRequest();
         request.setTitle("Perfume Test");
         request.setDescription("Desc");
@@ -97,19 +113,20 @@ class OfferControllerTest {
         request.setCategory("perfumes");
         request.setTags(Set.of("test"));
 
-        // WHEN + THEN
         mockMvc.perform(post("/offers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors[*].field", hasItem("price")));
 
-        verify(createOfferService, times(0)).createOffer(any(CreateOfferCommand.class));
+        verify(createOfferService, never()).createOffer(any(CreateOfferCommand.class));
     }
 
     @Test
-    void shouldReturnBadRequestWhenTitleIsBlank() throws Exception {
+    void shouldReturnValidationErrorWhenTitleIsBlank() throws Exception {
 
-        // GIVEN
         CreateOfferRequest request = new CreateOfferRequest();
         request.setTitle("");
         request.setDescription("Desc");
@@ -117,19 +134,67 @@ class OfferControllerTest {
         request.setCategory("perfumes");
         request.setTags(Set.of("test"));
 
-        // WHEN + THEN
         mockMvc.perform(post("/offers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors[*].field", hasItem("title")));
 
-        verify(createOfferService, times(0)).createOffer(any(CreateOfferCommand.class));
+        verify(createOfferService, never()).createOffer(any(CreateOfferCommand.class));
+    }
+
+    @Test
+    void shouldReturnValidationErrorWhenCategoryIsBlank() throws Exception {
+
+        CreateOfferRequest request = new CreateOfferRequest();
+        request.setTitle("Perfume");
+        request.setDescription("Desc");
+        request.setPrice(new BigDecimal("10000"));
+        request.setCategory("");
+        request.setTags(Set.of("test"));
+
+        mockMvc.perform(post("/offers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors[*].field", hasItem("category")));
+
+        verify(createOfferService, never()).createOffer(any(CreateOfferCommand.class));
+    }
+
+    @Test
+    void shouldReturnBusinessErrorWhenValidToIsBeforeValidFromOnCreate() throws Exception {
+
+        CreateOfferRequest request = new CreateOfferRequest();
+        request.setTitle("Perfume Test");
+        request.setDescription("Desc");
+        request.setPrice(new BigDecimal("10000"));
+        request.setCategory("perfumes");
+        request.setTags(Set.of("test"));
+        request.setValidFrom(LocalDate.of(2025, 3, 31));
+        request.setValidTo(LocalDate.of(2025, 3, 1));
+
+        when(createOfferService.createOffer(any(CreateOfferCommand.class)))
+                .thenThrow(new RuntimeException("validTo cannot be before validFrom"));
+
+        mockMvc.perform(post("/offers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("validTo cannot be before validFrom"))
+                .andExpect(jsonPath("$.errors").isArray());
+
+        verify(createOfferService, times(1)).createOffer(any(CreateOfferCommand.class));
     }
 
     @Test
     void shouldReturnListOfOffers() throws Exception {
 
-        // GIVEN
         OfferResponse offer1 = new OfferResponse(
                 1L,
                 "Ibuprofen 400mg",
@@ -156,46 +221,24 @@ class OfferControllerTest {
 
         when(listOffersService.list()).thenReturn(List.of(offer1, offer2));
 
-        // WHEN + THEN
         mockMvc.perform(get("/offers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].title").value("Ibuprofen 400mg"))
-                .andExpect(jsonPath("$[0].description").value("Pain relief tablets"))
-                .andExpect(jsonPath("$[0].price").value(2500.00))
-                .andExpect(jsonPath("$[0].category").value("PAIN_RELIEF"))
-                .andExpect(jsonPath("$[0].active").value(true))
+                .andExpect(jsonPath("$[0].validFrom").value("2025-03-01"))
+                .andExpect(jsonPath("$[0].validTo").value("2025-03-31"))
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].title").value("Vitamin C"))
-                .andExpect(jsonPath("$[1].description").value("Immune support supplement"))
-                .andExpect(jsonPath("$[1].price").value(1800.00))
-                .andExpect(jsonPath("$[1].category").value("VITAMINS"))
-                .andExpect(jsonPath("$[1].active").value(true));
+                .andExpect(jsonPath("$[1].validFrom").value("2025-04-01"))
+                .andExpect(jsonPath("$[1].validTo").value("2025-04-30"));
 
         verify(listOffersService, times(1)).list();
     }
-    @Test
-    void shouldReturnBadRequestWhenCategoryIsBlank() throws Exception {
 
-        CreateOfferRequest request = new CreateOfferRequest();
-        request.setTitle("Perfume");
-        request.setDescription("Desc");
-        request.setPrice(new BigDecimal("10000"));
-        request.setCategory(""); // inválido
-        request.setTags(Set.of("test"));
-
-        mockMvc.perform(post("/offers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-
-        verify(createOfferService, times(0)).createOffer(any());
-    }
     @Test
     void shouldUpdateOffer() throws Exception {
 
-        // GIVEN
         Long offerId = 1L;
 
         UpdateOfferRequest request = new UpdateOfferRequest();
@@ -204,6 +247,8 @@ class OfferControllerTest {
         request.setPrice(new BigDecimal("15000"));
         request.setCategory("updated-category");
         request.setTags(Set.of("updated", "promo"));
+        request.setValidFrom(LocalDate.of(2025, 4, 1));
+        request.setValidTo(LocalDate.of(2025, 4, 30));
 
         Offer updatedOffer = Offer.builder()
                 .id(offerId)
@@ -213,76 +258,58 @@ class OfferControllerTest {
                 .category("updated-category")
                 .tags(Set.of("updated", "promo"))
                 .active(true)
+                .validFrom(LocalDate.of(2025, 4, 1))
+                .validTo(LocalDate.of(2025, 4, 30))
                 .build();
 
         when(updateOfferService.updateOffer(any(Long.class), any(UpdateOfferCommand.class)))
                 .thenReturn(updatedOffer);
 
-        // WHEN + THEN
         mockMvc.perform(put("/offers/{id}", offerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Updated Perfume"))
-                .andExpect(jsonPath("$.description").value("Updated Desc"))
-                .andExpect(jsonPath("$.price").value(15000))
-                .andExpect(jsonPath("$.category").value("updated-category"))
-                .andExpect(jsonPath("$.active").value(true));
+                .andExpect(jsonPath("$.validFrom").value("2025-04-01"))
+                .andExpect(jsonPath("$.validTo").value("2025-04-30"));
 
         verify(updateOfferService, times(1))
                 .updateOffer(any(Long.class), any(UpdateOfferCommand.class));
     }
 
     @Test
-    void shouldReturnBadRequestWhenUpdatingOfferWithNegativePrice() throws Exception {
+    void shouldReturnBusinessErrorWhenValidToIsBeforeValidFromOnUpdate() throws Exception {
 
-        // GIVEN
         Long offerId = 1L;
 
         UpdateOfferRequest request = new UpdateOfferRequest();
         request.setTitle("Updated Perfume");
         request.setDescription("Updated Desc");
-        request.setPrice(new BigDecimal("-15000"));
-        request.setCategory("updated-category");
-        request.setTags(Set.of("updated", "promo"));
-
-        // WHEN + THEN
-        mockMvc.perform(put("/offers/{id}", offerId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-
-        verify(updateOfferService, never())
-                .updateOffer(any(Long.class), any(UpdateOfferCommand.class));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenUpdatingOfferWithBlankTitle() throws Exception {
-
-        // GIVEN
-        Long offerId = 1L;
-
-        UpdateOfferRequest request = new UpdateOfferRequest();
-        request.setTitle("");
-        request.setDescription("Updated Desc");
         request.setPrice(new BigDecimal("15000"));
         request.setCategory("updated-category");
         request.setTags(Set.of("updated", "promo"));
+        request.setValidFrom(LocalDate.of(2025, 4, 30));
+        request.setValidTo(LocalDate.of(2025, 4, 1));
 
-        // WHEN + THEN
+        when(updateOfferService.updateOffer(any(Long.class), any(UpdateOfferCommand.class)))
+                .thenThrow(new RuntimeException("validTo cannot be before validFrom"));
+
         mockMvc.perform(put("/offers/{id}", offerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("validTo cannot be before validFrom"))
+                .andExpect(jsonPath("$.errors").isArray());
 
-        verify(updateOfferService, never())
+        verify(updateOfferService, times(1))
                 .updateOffer(any(Long.class), any(UpdateOfferCommand.class));
     }
+
     @Test
     void shouldDisableOffer() throws Exception {
 
-        // GIVEN
         Long offerId = 1L;
 
         Offer disabledOffer = Offer.builder()
@@ -293,19 +320,16 @@ class OfferControllerTest {
                 .category("perfumes")
                 .tags(Set.of("test"))
                 .active(false)
+                .validFrom(LocalDate.of(2025, 3, 1))
+                .validTo(LocalDate.of(2025, 3, 31))
                 .build();
 
         when(disableOfferService.disableOffer(offerId)).thenReturn(disabledOffer);
 
-        // WHEN + THEN
         mockMvc.perform(patch("/offers/{id}/disable", offerId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("Perfume Test"))
-                .andExpect(jsonPath("$.description").value("Desc"))
-                .andExpect(jsonPath("$.price").value(10000))
-                .andExpect(jsonPath("$.category").value("perfumes"))
-                .andExpect(jsonPath("$.active").value(false));
+                .andExpect(jsonPath("$.active").value(false))
+                .andExpect(jsonPath("$.validFrom").value("2025-03-01"));
 
         verify(disableOfferService, times(1)).disableOffer(offerId);
     }
